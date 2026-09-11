@@ -1,0 +1,24 @@
+# Use RHEL UBI9 Minimal base
+FROM registry.access.redhat.com/ubi9/ubi-minimal:latest
+
+# Install required dependencies
+# SDKMAN requires curl, zip, unzip, findutils, and which to operate correctly
+USER root
+RUN microdnf install -y tar gzip shadow-utils time zip unzip findutils which && microdnf clean all
+
+# Environment variables for SDKMAN and Java
+# Note: You must use SDKMAN's specific version identifier format (e.g., "25.0.1-tem" for Temurin)
+ARG JAVA_VERSION="25.0.1-tem"
+ENV JAVA_VERSION=${JAVA_VERSION}
+ENV SDKMAN_DIR="/root/.sdkman"
+
+# Install SDKMAN and the specified Java version
+# We use bash -c to source the SDKMAN script since it relies on bash functions
+RUN curl -s "https://get.sdkman.io" | bash && \
+    bash -c "source $SDKMAN_DIR/bin/sdkman-init.sh && \
+    sdk install java $JAVA_VERSION && \
+    sdk default java $JAVA_VERSION"
+
+# Expose Java to the system PATH so it runs without needing to source SDKMAN in every shell
+ENV JAVA_HOME="${SDKMAN_DIR}/candidates/java/current"
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
