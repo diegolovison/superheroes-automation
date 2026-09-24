@@ -1,0 +1,5 @@
+# extend: unified.build.script.yaml
+# https://github.com/Hyperfoil/qDup/issues/252
+# only state allowed here - see run.sh
+states:
+  COPY_DOCKER: false
